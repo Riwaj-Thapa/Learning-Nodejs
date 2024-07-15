@@ -1,0 +1,1 @@
+PLease use npm i after cloning the project
