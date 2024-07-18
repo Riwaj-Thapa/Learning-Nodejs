@@ -1,10 +1,11 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import mysql from 'mysql';
-import open from 'open';
+const express = require('express');
+const bodyParser = require('body-parser');
+const mysql = require('mysql');
+const bcrypt = require('bcrypt');
 
 const app = express();
-const port = 3000;
+const port = 3000; // or change to 3001 if needed
+const saltRounds = 12;
 
 // Middleware
 app.use(bodyParser.json());
@@ -59,19 +60,26 @@ app.get("/register", (req, res) => {
 });
 
 // Route to handle registration
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
 
-  const query = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-  connection.query(query, [username, email, password], (error, results) => {
-    if (error) {
-      console.error("Error inserting user: ", error.stack);
-      res.status(500).send("Error registering user");
-      return;
-    }
-    console.log("User registered: ", results);
-    res.send("Registration successful");
-  });
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const query = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+
+    connection.query(query, [username, email, hashedPassword], (error, results) => {
+      if (error) {
+        console.error("Error inserting user: ", error.stack);
+        res.status(500).send("Error registering user");
+        return;
+      }
+      console.log("User registered: ", results);
+      res.send("Registration successful");
+    });
+  } catch (error) {
+    console.error("Error hashing password: ", error.stack);
+    res.status(500).send("Error registering user");
+  }
 });
 
 // Route to display login form
@@ -101,8 +109,8 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
-  const query = "SELECT * FROM users WHERE username = ? AND password = ?";
-  connection.query(query, [username, password], (error, results) => {
+  const query = "SELECT * FROM users WHERE username = ?";
+  connection.query(query, [username], async (error, results) => {
     if (error) {
       console.error("Error during login: ", error.stack);
       res.status(500).send("Error logging in");
@@ -110,8 +118,20 @@ app.post("/login", (req, res) => {
     }
 
     if (results.length > 0) {
-      console.log("Login successful: ", results);
-      res.send("Login successful");
+      const user = results[0];
+      try {
+        const match = await bcrypt.compare(password, user.password);
+        if (match) {
+          console.log("Login successful: ", user);
+          res.send("Login successful");
+        } else {
+          console.log("Invalid credentials");
+          res.status(401).send("Invalid credentials");
+        }
+      } catch (error) {
+        console.error("Error comparing passwords: ", error.stack);
+        res.status(500).send("Error logging in");
+      }
     } else {
       console.log("Invalid credentials");
       res.status(401).send("Invalid credentials");
@@ -119,8 +139,12 @@ app.post("/login", (req, res) => {
   });
 });
 
-// Start the server and open the browser
+// Start the server
 app.listen(port, async () => {
   console.log(`Example app listening on port ${port}`);
-  await open(`http://localhost:${port}/register`);
+  const open = await import('open'); // Dynamic import for 'open'
+  await open.default(`http://localhost:${port}/register`);
 });
+
+
+
