@@ -92,7 +92,7 @@ app.post("/register", upload.single("file"), async (req, res) => {
         return;
       }
       console.log("User registered: ", results);
-      res.send("Registration successful");
+      res.send("Registration Successful");
     });
   } catch (error) {
     console.error("Error hashing password: ", error.stack);
@@ -123,55 +123,6 @@ app.get("/login", (req, res) => {
   `);
 });
 
-// Route to handle login
-// app.post("/login", (req, res) => {
-//   const { username, password } = req.body;
-
-//   const query = "SELECT * FROM users WHERE username = ?";
-//   connection.query(query, [username], async (error, results) => {
-//     if (error) {
-//       console.error("Error during login: ", error.stack);
-//       res.status(500).send("Error logging in");
-//       return;
-//     }
-
-//     if (results.length > 0) {
-//       const user = results[0];
-//       try {
-//         const match = await bcrypt.compare(password, user.password);
-//         if (match) {
-//           console.log("Login successful: ", user);
-//           res.send(`<!DOCTYPE html>
-//                     <html lang="en">
-//                     <head>
-//                         <meta charset="UTF-8">
-//                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//                         <title>Document</title>
-//                     </head>
-//                     <body>
-//                     <form action="/update/${user.id}" method="POST">
-//                         <h1>
-//                             Congratulations successfully logged in. 
-//                         </h1>
-//                         <button>
-//                             Edit Profile
-//                         </button>
-//                     </body>
-//                     </html>`);
-//         } else {
-//           console.log("Invalid credentials");
-//           res.status(401).send("Invalid credentials");
-//         }
-//       } catch (error) {
-//         console.error("Error comparing passwords: ", error.stack);
-//         res.status(500).send("Error logging in");
-//       }
-//     } else {
-//       console.log("Invalid credentials");
-//       res.status(401).send("Invalid credentials");
-//     }
-//   });
-// });
 
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
@@ -198,7 +149,7 @@ app.post("/login", (req, res) => {
                         <title>Logged In</title>
                     </head>
                     <body>
-                        <h1>Congratulations, successfully logged in.</h1>
+                        <h1>Congratulations ${user.username} !! you have successfully logged in.</h1>
                         <form action="/update/${user.id}" method="get">
                             <button type="submit">Edit Profile</button>
                         </form>
@@ -220,9 +171,6 @@ app.post("/login", (req, res) => {
 });
 
 
-
-
-// Route to handle update
 // Route to handle update
 app.get("/update/:id", (req, res) => {
   const userId = req.params.id;
@@ -244,21 +192,26 @@ app.get("/update/:id", (req, res) => {
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Edit Profile</title>
                 </head>
-                <body>
+                  <body>
                     <h1>Edit Profile</h1>
+                    <img src="${user.file_path}" alt="${user.username}" style="width: 100px; height: 100px;">
+          <br>
+
                     <form action="/update/${user.id}" method="post">
                         <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" value="${user.username}" required>
+                        <input type="text" id="username" name="username" value="${user.username} " required>
                         <br>
                         <label for="email">Email:</label>
                         <input type="email" id="email" name="email" value="${user.email}" required>
                         <br>
                         <label for="password">New Password:</label>
-                        <input type="password" id="password" name="password">
+                        <input type="password" id="password" name="password" required>
                         <br>
                         <label for="file_path">File Path:</label>
-                        <input type="text" id="file_path" name="file_path" value="${user.file_path}">
-                        <br>
+                    
+                        <input type="file" id="file_path" name="file_path" value="${user.file_path}required><br><br>
+
+                        
                         <button type="submit">Update Profile</button>
                     </form>
                 </body>
