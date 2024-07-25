@@ -1,11 +1,9 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const express = require("express");
-
-
 const app = express();
 
-app.use(express.json());
 
+app.use(express.json());
 mongoose.connect('mongodb+srv://rambathapa562:bEqkOF1s4f4uKnnh@riwaj.pz3vkdq.mongodb.net/')
   .then(() => console.log('Connected!'));
 
@@ -33,7 +31,9 @@ const response  = await Cat.find();
 })
 
 app.listen(4000, () => {
-    console.log("http:localhost/4000")
+    console.log("http://localhost:4000/")
+
+    
 })
 
 

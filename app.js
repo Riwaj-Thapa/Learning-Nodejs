@@ -62,9 +62,11 @@ app.get("/register", (req, res) => {
           <input type="email" id="email" name="email"><br><br>
           <label for="password">Password:</label><br>
           <input type="password" id="password" name="password"><br><br>
-          <label for="file">Profile Picture:</label>
+          <label for="file"> Profile Picture:</label>
           <input type="file" id="file" name="file" required><br><br>
           <input type="submit" value="Register">
+          <input type="file" name="myFiles" multiple>
+          <input type="submit" value="Upload">
         </form>
       </body>
     </html>
@@ -72,6 +74,34 @@ app.get("/register", (req, res) => {
 });
 
 // Route to handle registration
+// app.post("/register", upload.single("file"), async (req, res) => {
+//   const { username, email, password } = req.body;
+//   const file = req.file;
+
+//   if (!file) {
+//     return res.status(400).send('No file uploaded.');
+//   }
+
+//   try {
+//     const hashedPassword = await bcrypt.hash(password, saltRounds);
+//     const filePath = `/uploads/${file.filename}`;
+//     const query = "INSERT INTO users (username, email, password, file_path) VALUES (?, ?, ?, ?)";
+
+//     connection.query(query, [username, email, hashedPassword, filePath], (error, results) => {
+//       if (error) {
+//         console.error("Error inserting user: ", error.stack);
+//         res.status(500).send("Error registering user");
+//         return;
+//       }
+//       console.log("User registered: ", results);
+//       res.send("Registration Successful");
+//     });
+//   } catch (error) {
+//     console.error("Error hashing password: ", error.stack);
+//     res.status(500).send("Error registering user");
+//   }
+// });
+
 app.post("/register", upload.single("file"), async (req, res) => {
   const { username, email, password } = req.body;
   const file = req.file;
