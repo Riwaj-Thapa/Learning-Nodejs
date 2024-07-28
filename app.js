@@ -294,3 +294,4 @@ app.listen(port, async () => {
   const open = await import('open'); // Dynamic import for 'open'
   await open.default(`http://localhost:${port}/register`);
 });
+
