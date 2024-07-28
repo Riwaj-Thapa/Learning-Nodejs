@@ -1,10 +1,13 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
+const dotenv = require('dotenv');
+dotenv.config();
 
 
-app.use(express.json());
-mongoose.connect('mongodb+srv://rambathapa562:bEqkOF1s4f4uKnnh@riwaj.pz3vkdq.mongodb.net/')
+
+app.use(express.json(process.env.Connections));
+mongoose.connect()
   .then(() => console.log('Connected!'));
 
 const Cat = mongoose.model("Cat",{name: String});
